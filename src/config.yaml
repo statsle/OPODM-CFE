@@ -1,0 +1,51 @@
+# Configuration for Stable Diffusion fine-tuning with Accelerate & WandB
+# For further information about the parameters, see the main.py file
+
+model_name: runwayml/stable-diffusion-v1-5  # Pretrained model path or Hugging Face model name
+data_path: ...                              # Path to prompt dataset
+truncate_dataset: 262144                    # Max prompt dataset size
+
+mixed_precision: fp16
+seed: 99                    # We used 99 for all our results
+
+# Training parameters
+batch_size: 4               # Batch size for training
+num_train_epochs: 1         # Number of training epochs
+gpo_beta: 5000              # Regularization parameter for loss function
+rank: 16                    # LoRA rank
+max_train_steps: 800        # Max training steps (800 \approx 60h with 4xA100 40GB)
+quality_threshold: 0.55     # Sample filtering threshold (0.5 + \delta)
+snr_gamma: 20               # Min-SNR-\gamma
+loss: exp                   # GPO loss function (can be 'DPO', 'IPO', 'SLiC' or 'exp')
+
+# Image training options
+resolution: 512             # For SD1.5 should be 512
+center_crop: True           # Random transformation during training
+random_flip: True           # Random transformation during training
+
+# Optimizer & scheduler parameters
+lr: 2e-7
+adam_beta1: 0.9
+adam_beta2: 0.999
+adam_weight_decay: 1e-2
+adam_epsilon: 1e-8
+lr_warmup_steps: 100
+lr_scheduler: constant_with_warmup
+scale_lr: True
+
+# Logging & tracking
+wandb_project: ...                # Name of the WandB project
+run_id: ...                       # WandB run id
+resume_run: allow                 # What to do if run_id already exists
+wandb_dir: ...                    # WandB logging directory
+write_dir: ...                    # Checkpoints and final model write directory
+resume_from_checkpoint: False     # If not False, it will read the specified checkpoint from the write_dir
+validation_epochs: 2              # Number of epochs before validation loop. We don't use this in our work.
+validation_threshold: 0.5         # Win threshold during validation
+checkpointing_steps: 50           # A checkpoint is saved every N steps
+checkpoints_total_limit: null     # Allowed number of checkpoints, after reaching the oldest is removed
+
+gradient_accumulation_steps: 16   # Gradient accumulation steps, computed by Accelerator
+max_grad_norm: 1.0                # Gradient norm clipping
+gradient_checkpointing: False     # Probably should always be false
+allow_tf32: True                  # Set to True if using Ampere GPU

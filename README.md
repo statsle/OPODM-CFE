@@ -1,1 +1,1 @@
-# OPODM-CFE
+# Online Preference Optimization for Diffusion Models with Classifier-Free Exploration
